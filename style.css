@@ -112,6 +112,25 @@ header {
 .player-box.bust { background: #3a1a1a; }
 .player-box.stand { opacity: 0.8; }
 
+.player-box.out {
+    position: relative;
+    overflow: hidden;
+    pointer-events: none;
+}
+.player-box.out::after {
+    content: '籌碼用盡';
+    position: absolute;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.82);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #555;
+    letter-spacing: 0.1em;
+}
+
 .player-box.result-win {
     background: #3a1a1a;
     border-color: #e94560;

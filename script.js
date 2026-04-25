@@ -119,8 +119,12 @@ function updateUI() {
         const statusHint = document.getElementById(`player-${p.id}-status`);
         const controls = pBox.querySelector('.player-controls');
         
-        pBox.classList.remove('active', 'stand', 'bust', 'result-win', 'result-lose', 'result-draw');
-        if (phase === 'resolved' && p.result) {
+        pBox.classList.remove('active', 'stand', 'bust', 'out', 'result-win', 'result-lose', 'result-draw');
+        if (p.status === 'out') {
+            pBox.classList.add('out');
+            statusHint.textContent = '籌碼用盡';
+            controls.style.display = "none";
+        } else if (phase === 'resolved' && p.result) {
             pBox.classList.add(`result-${p.result}`);
             const resultLabel = { win: '🏆 獲勝！', lose: '💀 落敗', draw: '🤝 平手' }[p.result];
             statusHint.textContent = `${resultLabel}（分數：${calculateScore(p.hand)}）`;
@@ -173,21 +177,26 @@ async function startRound() {
     dealerHand = [];
     players.forEach(p => {
         p.hand = [];
-        p.status = 'playing';
         p.result = null;
-        // Base bet
-        const baseBet = 1 + Math.floor(Math.random() * 2);
-        p.bet = Math.min(p.chips, isLured ? 5 : baseBet);
-        p.chips -= p.bet;
+        if (p.chips <= 0) {
+            p.status = 'out';
+            p.bet = 0;
+        } else {
+            p.status = 'playing';
+            const baseBet = 1 + Math.floor(Math.random() * 2);
+            p.bet = Math.min(p.chips, isLured ? 5 : baseBet);
+            p.chips -= p.bet;
+        }
     });
     // isLured is NOT reset here anymore, but at the start of resolution
     
     document.getElementById('game-status').textContent = "正在發送起始牌...";
     updateUI();
 
-    // Initial Deal (2 cards each)
+    // Initial Deal (2 cards each, skip 'out' players)
     for (let i = 0; i < 2; i++) {
         for (let p of players) {
+            if (p.status === 'out') continue;
             p.hand.push(deck.shift());
             updateUI();
             await new Promise(r => setTimeout(r, 300));
@@ -198,9 +207,9 @@ async function startRound() {
     }
 
     phase = 'player-turn';
-    currentPlayerTurn = 0;
+    currentPlayerTurn = -1;
     document.getElementById('game-status').textContent = "現在是閒家回合，你可以決定是否發牌或扣牌。";
-    updateUI();
+    nextTurn();
 }
 
 function giveCardToPlayer() {
@@ -244,6 +253,9 @@ function selectStashCard(index) {
 
 function nextTurn() {
     currentPlayerTurn++;
+    while (currentPlayerTurn < players.length && players[currentPlayerTurn].status === 'out') {
+        currentPlayerTurn++;
+    }
     if (currentPlayerTurn >= players.length) {
         phase = 'dealer-turn';
         document.getElementById('game-status').textContent = "輪到莊家（你）的回合了。";
@@ -278,6 +290,7 @@ function resolveRound() {
     let msg = "回合結束。";
 
     players.forEach(p => {
+        if (p.status === 'out') return;
         const pScore = calculateScore(p.hand);
         if (p.status === 'bust') {
             p.result = 'lose';
