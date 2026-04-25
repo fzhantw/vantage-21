@@ -1,0 +1,112 @@
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'PingFang TC', 'Microsoft JhengHei', sans-serif;
+    background-color: #1a1a2e;
+    color: #e9e9e9;
+    padding: 20px;
+}
+
+.game-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+header {
+    margin-bottom: 30px;
+}
+
+#game-status {
+    background: #16213e;
+    padding: 10px;
+    border-radius: 8px;
+    margin-top: 10px;
+    color: #0f3460;
+    background: #e94560;
+    color: white;
+    font-weight: bold;
+}
+
+.main-area {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.deck-preview {
+    background: rgba(106, 13, 173, 0.2);
+    padding: 15px;
+    border: 1px solid #6a0dad;
+    border-radius: 15px;
+}
+
+.cards-row {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    min-height: 100px;
+    margin: 10px 0;
+}
+
+.card {
+    width: 60px;
+    height: 90px;
+    background: white;
+    color: black;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    font-size: 1.2rem;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+    position: relative;
+}
+
+.card.red { color: #d00; }
+
+.dealer-area {
+    background: #0f3460;
+    padding: 20px;
+    border-radius: 15px;
+}
+
+.players-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 15px;
+}
+
+.player-box {
+    background: #16213e;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #0f3460;
+}
+
+.player-box.bust { background: #300; }
+.player-box.win { border-color: #4ecdc4; box-shadow: 0 0 10px #4ecdc4; }
+
+.chips { color: #ffd700; font-weight: bold; font-size: 1.1rem; }
+.bet { color: #4ecdc4; font-size: 0.9rem; }
+
+button {
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: none;
+    font-weight: bold;
+    transition: 0.2s;
+}
+
+#skip-card-btn { background: #6a0dad; color: white; margin-top: 10px; }
+#lure-btn { background: #ffd700; color: #1a1a2e; margin-top: 20px; width: 100%; font-size: 1.2rem; }
+.dealer-controls button { margin: 5px; background: #e94560; color: white; }
+button:disabled { background: #444; cursor: not-allowed; opacity: 0.5; }
+
+.card.hidden { background: #444; color: transparent; }
