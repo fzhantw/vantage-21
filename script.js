@@ -139,6 +139,12 @@ function updateUI() {
 
             if (currentPlayerTurn === p.id && phase === 'player-turn') {
                 pBox.classList.add('active');
+                
+                // Scroll player into view on mobile carousel
+                if (window.innerWidth <= 768) {
+                    pBox.scrollIntoView({ behavior: 'smooth', inline: 'center', block: 'nearest' });
+                }
+
                 const wantsHit = shouldPlayerHit(p);
                 if (statusHint) statusHint.textContent = wantsHit ? "我想要牌！" : "我停牌。";
                 if (!wantsHit) {

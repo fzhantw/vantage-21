@@ -248,8 +248,23 @@ button:disabled {
     }
 
     .players-grid {
-        grid-template-columns: 1fr;
+        display: flex;
+        overflow-x: auto;
         gap: 15px;
+        padding: 10px 20px;
+        scroll-snap-type: x mandatory;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Hide scrollbar for cleaner look */
+    }
+
+    .players-grid::-webkit-scrollbar {
+        display: none;
+    }
+
+    .player-box {
+        flex: 0 0 85%; /* Shows most of one player, hints at next */
+        scroll-snap-align: center;
+        margin-bottom: 0;
     }
 
     .card {
