@@ -141,7 +141,10 @@ function updateUI() {
     document.getElementById('dealer-hit-btn').disabled = (phase !== 'dealer-turn');
     document.getElementById('dealer-stand-btn').disabled = (phase !== 'dealer-turn');
     document.getElementById('next-round-btn').disabled = (phase !== 'idle' && phase !== 'resolved');
-    document.getElementById('lure-btn').disabled = (phase !== 'idle' && phase !== 'resolved');
+    
+    // Lure button logic: can use before round OR during player turn if not already lured
+    const lureBtn = document.getElementById('lure-btn');
+    lureBtn.disabled = (phase === 'initial-deal' || phase === 'dealer-turn' || phase === 'resolved' || isLured);
 }
 
 function createCardElement(card, isHidden = false) {
@@ -164,10 +167,12 @@ async function startRound() {
     players.forEach(p => {
         p.hand = [];
         p.status = 'playing';
-        p.bet = isLured ? Math.min(p.chips, 5) : Math.min(p.chips, 1 + Math.floor(Math.random() * 2));
+        // Base bet
+        const baseBet = 1 + Math.floor(Math.random() * 2);
+        p.bet = Math.min(p.chips, isLured ? 5 : baseBet);
         p.chips -= p.bet;
     });
-    isLured = false;
+    // isLured is NOT reset here anymore, but at the start of resolution
     
     document.getElementById('game-status').textContent = "正在發送起始牌...";
     updateUI();
@@ -279,6 +284,7 @@ function resolveRound() {
         }
     });
 
+    isLured = false; // Reset lure for next round
     document.getElementById('game-status').textContent = msg;
     updateUI();
     checkGameOver();
@@ -301,8 +307,25 @@ document.getElementById('next-round-btn').onclick = startRound;
 document.getElementById('dealer-hit-btn').onclick = dealerHit;
 document.getElementById('dealer-stand-btn').onclick = dealerStand;
 document.getElementById('lure-btn').onclick = () => {
+    if (isLured) return;
+    
     isLured = true;
-    document.getElementById('game-status').textContent = "魔術：財迷心竅已發動，下一局閒家將會豪賭。";
+    if (phase === 'player-turn') {
+        // Immediate effect: increase current bets
+        players.forEach(p => {
+            const currentBet = p.bet;
+            const targetBet = 5;
+            const increase = Math.min(p.chips, targetBet - currentBet);
+            if (increase > 0) {
+                p.bet += increase;
+                p.chips -= increase;
+            }
+        });
+        document.getElementById('game-status').textContent = "魔術：財迷心竅！閒家經不起你的挑釁，紛紛加注了！";
+    } else {
+        document.getElementById('game-status').textContent = "魔術：財迷心竅已發動，下一局閒家將會豪賭。";
+    }
+    updateUI();
 };
 
 // Bind Player Controls (Dynamic delegation or direct bind)
