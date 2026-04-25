@@ -3,61 +3,82 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>魔術師 21 點 (Magician Blackjack)</title>
+    <title>魔術師 21 點：掌控者 (Magician Blackjack)</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="game-container">
         <header>
-            <h1>魔術師 21 點</h1>
-            <div id="game-status">遊戲開始！你是莊家（魔術師）</div>
+            <h1>魔術師 21 點：掌控者</h1>
+            <div id="game-status">點擊「開始新回合」展開魔法...</div>
         </header>
 
         <div class="main-area">
-            <div class="deck-preview">
-                <h3>預視未來 (Next 3 Cards)</h3>
-                <div id="future-cards" class="cards-row"></div>
-                <button id="skip-card-btn">🔮 扣除下一張牌 (限用一次/局)</button>
+            <div class="magician-dashboard">
+                <div class="deck-preview">
+                    <h3>🔮 預視未來 (Next 3)</h3>
+                    <div id="future-cards" class="cards-row"></div>
+                </div>
+                <div class="dealer-stash">
+                    <h3>📦 扣下的牌 (Stash)</h3>
+                    <div id="stash-cards" class="cards-row"></div>
+                    <div id="stash-info" style="font-size: 0.8rem;">點擊卡片將其加入你的手牌</div>
+                </div>
             </div>
 
             <div class="dealer-area">
                 <h3>你的手牌 (莊家)</h3>
                 <div id="dealer-cards" class="cards-row"></div>
                 <div id="dealer-score">分數: 0</div>
-                <div class="dealer-controls">
-                    <button id="hit-btn" disabled>要牌 (Hit)</button>
-                    <button id="stand-btn" disabled>停牌 (Stand)</button>
+                <div class="controls">
+                    <button id="dealer-hit-btn" class="btn-action" disabled>莊家要牌</button>
+                    <button id="dealer-stand-btn" class="btn-action" disabled>莊家停牌</button>
                     <button id="next-round-btn">開始新回合</button>
                 </div>
             </div>
 
             <div class="players-grid">
+                <!-- Player A -->
                 <div class="player-box" id="player-0">
                     <h4>閒家 A</h4>
                     <div class="chips">籌碼: 10</div>
-                    <div class="bet">本局注好: 0</div>
+                    <div class="bet">注好: 0</div>
                     <div class="cards cards-row"></div>
-                    <div class="score">分數: 0</div>
+                    <div id="player-0-status" class="player-action-hint">等待中...</div>
+                    <div class="controls player-controls" style="display: none;">
+                        <button class="btn-action give-btn">發牌給他</button>
+                        <button class="btn-magician stash-btn">扣下此牌</button>
+                    </div>
                 </div>
+                <!-- Player B -->
                 <div class="player-box" id="player-1">
                     <h4>閒家 B</h4>
                     <div class="chips">籌碼: 10</div>
-                    <div class="bet">本局注好: 0</div>
+                    <div class="bet">注好: 0</div>
                     <div class="cards cards-row"></div>
-                    <div class="score">分數: 0</div>
+                    <div id="player-1-status" class="player-action-hint">等待中...</div>
+                    <div class="controls player-controls" style="display: none;">
+                        <button class="btn-action give-btn">發牌給他</button>
+                        <button class="btn-magician stash-btn">扣下此牌</button>
+                    </div>
                 </div>
+                <!-- Player C -->
                 <div class="player-box" id="player-2">
                     <h4>閒家 C</h4>
                     <div class="chips">籌碼: 10</div>
-                    <div class="bet">本局注好: 0</div>
+                    <div class="bet">注好: 0</div>
                     <div class="cards cards-row"></div>
-                    <div class="score">分數: 0</div>
+                    <div id="player-2-status" class="player-action-hint">等待中...</div>
+                    <div class="controls player-controls" style="display: none;">
+                        <button class="btn-action give-btn">發牌給他</button>
+                        <button class="btn-magician stash-btn">扣下此牌</button>
+                    </div>
                 </div>
             </div>
         </div>
 
         <div class="magician-skills">
-            <button id="lure-btn">💡 使用「財迷心竅」：引誘閒家下大注</button>
+            <button id="lure-btn" class="btn-lure">💡 財迷心竅 (引誘下大注)</button>
         </div>
     </div>
     <script src="script.js"></script>

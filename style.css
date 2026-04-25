@@ -12,34 +12,39 @@ body {
 }
 
 .game-container {
-    max-width: 1000px;
+    max-width: 1100px;
     margin: 0 auto;
     text-align: center;
 }
 
 header {
-    margin-bottom: 30px;
+    margin-bottom: 20px;
 }
 
 #game-status {
-    background: #16213e;
+    background: #e94560;
     padding: 10px;
     border-radius: 8px;
     margin-top: 10px;
-    color: #0f3460;
-    background: #e94560;
     color: white;
     font-weight: bold;
+    min-height: 40px;
 }
 
 .main-area {
     display: flex;
     flex-direction: column;
+    gap: 15px;
+}
+
+.magician-dashboard {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
     gap: 20px;
 }
 
-.deck-preview {
-    background: rgba(106, 13, 173, 0.2);
+.deck-preview, .dealer-stash {
+    background: rgba(106, 13, 173, 0.15);
     padding: 15px;
     border: 1px solid #6a0dad;
     border-radius: 15px;
@@ -48,32 +53,41 @@ header {
 .cards-row {
     display: flex;
     justify-content: center;
-    gap: 10px;
+    gap: 8px;
     min-height: 100px;
     margin: 10px 0;
+    flex-wrap: wrap;
 }
 
 .card {
-    width: 60px;
-    height: 90px;
+    width: 65px;
+    height: 95px;
     background: white;
     color: black;
-    border-radius: 5px;
+    border-radius: 8px;
     display: flex;
     justify-content: center;
     align-items: center;
     font-weight: bold;
-    font-size: 1.2rem;
+    font-size: 1.1rem;
     box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
     position: relative;
+    border: 1px solid #ccc;
 }
 
 .card.red { color: #d00; }
+.card.hidden { 
+    background: linear-gradient(45deg, #1a1a2e 25%, #16213e 25%, #16213e 50%, #1a1a2e 50%, #1a1a2e 75%, #16213e 75%, #16213e 100%);
+    background-size: 10px 10px;
+    color: transparent;
+    border: 2px solid #6a0dad;
+}
 
 .dealer-area {
     background: #0f3460;
-    padding: 20px;
+    padding: 15px;
     border-radius: 15px;
+    border: 2px solid #e94560;
 }
 
 .players-grid {
@@ -86,27 +100,57 @@ header {
     background: #16213e;
     padding: 15px;
     border-radius: 10px;
-    border: 1px solid #0f3460;
+    border: 2px solid #0f3460;
+    transition: 0.3s;
 }
 
-.player-box.bust { background: #300; }
-.player-box.win { border-color: #4ecdc4; box-shadow: 0 0 10px #4ecdc4; }
+.player-box.active {
+    border-color: #ffd700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
+}
+
+.player-box.bust { background: #3a1a1a; }
+.player-box.stand { opacity: 0.8; }
 
 .chips { color: #ffd700; font-weight: bold; font-size: 1.1rem; }
-.bet { color: #4ecdc4; font-size: 0.9rem; }
+.bet { color: #4ecdc4; font-size: 0.9rem; margin-bottom: 5px; }
+
+.controls {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
 
 button {
-    padding: 10px 15px;
+    padding: 10px 18px;
     cursor: pointer;
-    border-radius: 5px;
+    border-radius: 6px;
     border: none;
     font-weight: bold;
     transition: 0.2s;
+    background: #61dafb;
+    color: #1a1a2e;
 }
 
-#skip-card-btn { background: #6a0dad; color: white; margin-top: 10px; }
-#lure-btn { background: #ffd700; color: #1a1a2e; margin-top: 20px; width: 100%; font-size: 1.2rem; }
-.dealer-controls button { margin: 5px; background: #e94560; color: white; }
-button:disabled { background: #444; cursor: not-allowed; opacity: 0.5; }
+button:hover:not(:disabled) {
+    transform: translateY(-2px);
+    filter: brightness(1.1);
+}
 
-.card.hidden { background: #444; color: transparent; }
+button:disabled {
+    background: #444;
+    color: #888;
+    cursor: not-allowed;
+}
+
+.btn-magician { background: #6a0dad; color: white; }
+.btn-action { background: #e94560; color: white; }
+.btn-lure { background: #ffd700; color: #1a1a2e; }
+
+.stash-card-btn {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+    margin-top: 5px;
+}
