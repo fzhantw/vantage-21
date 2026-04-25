@@ -203,99 +203,108 @@ button:disabled {
 /* Mobile Optimizations */
 @media (max-width: 768px) {
     body {
-        padding: 60px 10px 160px 10px; /* More bottom padding for wrapped buttons */
+        padding: 55px 10px 130px 10px; /* Reduced padding */
+    }
+
+    .fixed-top {
+        padding: 8px; /* Slimmer top bar */
+        font-size: 0.9rem;
     }
 
     .fixed-bottom-bar {
-        padding: 10px;
-        gap: 8px;
+        padding: 8px;
+        gap: 5px;
     }
 
-    .action-group {
-        width: 100%;
-        justify-content: center;
+    .main-area {
+        gap: 10px; /* Tighter vertical spacing */
     }
 
     .magician-dashboard {
-        grid-template-columns: 1fr;
+        display: grid;
+        grid-template-columns: 1fr 1fr; /* Back to side-by-side but tiny */
         gap: 8px;
     }
 
     .deck-preview, .dealer-stash {
-        padding: 8px;
-        border-radius: 10px;
+        padding: 5px;
+        border-radius: 8px;
     }
 
-    .deck-preview h3, .dealer-stash h3 {
-        font-size: 0.9rem;
-        margin-bottom: 5px;
-    }
-
-    /* Smaller cards specifically for the preview/stash on mobile */
     .magician-dashboard .card {
-        width: 40px;
-        height: 60px;
-        font-size: 0.8rem;
+        width: 35px;
+        height: 50px;
+        font-size: 0.7rem;
     }
 
     .magician-dashboard .cards-row {
-        min-height: 65px;
-        margin: 5px 0;
+        min-height: 55px;
+        margin: 2px 0;
+        gap: 4px;
     }
 
-    #stash-info {
-        display: none; /* Hide helper text on mobile to save space */
+    .dealer-area {
+        padding: 8px;
     }
 
-    .players-grid {
-        display: flex;
-        overflow-x: auto;
-        gap: 15px;
-        padding: 10px 20px;
-        scroll-snap-type: x mandatory;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none; /* Hide scrollbar for cleaner look */
+    .dealer-area h3 {
+        display: inline-block;
+        font-size: 0.9rem;
+        margin-right: 10px;
     }
 
-    .players-grid::-webkit-scrollbar {
-        display: none;
-    }
-
-    .player-box {
-        flex: 0 0 85%; /* Shows most of one player, hints at next */
-        scroll-snap-align: center;
-        margin-bottom: 0;
-    }
-
-    .card {
-        width: 50px;
-        height: 75px;
+    #dealer-score {
+        display: inline-block;
         font-size: 0.9rem;
     }
 
-    .cards-row {
-        min-height: 80px;
+    .players-grid {
+        padding: 5px 10px;
+        gap: 10px;
     }
 
-    .controls {
+    .player-box {
+        padding: 10px;
+        flex: 0 0 80%;
+    }
+
+    .player-box h4 {
+        font-size: 0.9rem;
+        margin-bottom: 2px;
+    }
+
+    .card {
+        width: 45px; /* Slightly smaller main cards */
+        height: 65px;
+        font-size: 0.8rem;
+    }
+
+    .cards-row {
+        min-height: 70px;
+        margin: 5px 0;
+    }
+
+    h1 {
+        font-size: 1.2rem;
+        margin: 5px 0;
+    }
+
+    h3 {
+        font-size: 0.9rem;
+    }
+
+    .action-group {
+        width: auto;
+        justify-content: center;
         gap: 5px;
     }
 
     button {
-        padding: 12px 15px; /* Larger touch targets */
-        font-size: 0.9rem;
-        flex: 1 1 auto; /* Allow buttons to grow and fill row */
-    }
-
-    h1 {
-        font-size: 1.5rem;
-    }
-
-    h3 {
-        font-size: 1.1rem;
+        padding: 10px 12px;
+        font-size: 0.85rem;
     }
 
     .chips {
-        font-size: 1rem;
+        font-size: 0.9rem;
     }
 }
