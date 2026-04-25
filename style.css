@@ -112,6 +112,22 @@ header {
 .player-box.bust { background: #3a1a1a; }
 .player-box.stand { opacity: 0.8; }
 
+.player-box.result-win {
+    background: #3a1a1a;
+    border-color: #e94560;
+    box-shadow: 0 0 20px rgba(233, 69, 96, 0.4);
+}
+.player-box.result-lose {
+    background: #2a2a2a;
+    border-color: #555;
+    opacity: 0.6;
+    filter: grayscale(60%);
+}
+.player-box.result-draw {
+    background: #1e2a3a;
+    border-color: #4ecdc4;
+}
+
 .chips { color: #ffd700; font-weight: bold; font-size: 1.1rem; }
 .bet { color: #4ecdc4; font-size: 0.9rem; margin-bottom: 5px; }
 

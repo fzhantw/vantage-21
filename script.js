@@ -3,9 +3,9 @@ let dealerHand = [];
 let dealerStash = [];
 let selectedStashIndex = -1;
 let players = [
-    { id: 0, name: '閒家 A', chips: 10, hand: [], bet: 0, status: 'waiting' },
-    { id: 1, name: '閒家 B', chips: 10, hand: [], bet: 0, status: 'waiting' },
-    { id: 2, name: '閒家 C', chips: 10, hand: [], bet: 0, status: 'waiting' }
+    { id: 0, name: '閒家 A', chips: 10, hand: [], bet: 0, status: 'waiting', result: null },
+    { id: 1, name: '閒家 B', chips: 10, hand: [], bet: 0, status: 'waiting', result: null },
+    { id: 2, name: '閒家 C', chips: 10, hand: [], bet: 0, status: 'waiting', result: null }
 ];
 let isLured = false;
 let currentPlayerTurn = -1; // -1: none, 0-2: players, 3: dealer
@@ -119,22 +119,29 @@ function updateUI() {
         const statusHint = document.getElementById(`player-${p.id}-status`);
         const controls = pBox.querySelector('.player-controls');
         
-        pBox.classList.remove('active', 'stand', 'bust');
-        if (p.status === 'bust') pBox.classList.add('bust');
-        if (p.status === 'stand') pBox.classList.add('stand');
-
-        if (currentPlayerTurn === p.id && phase === 'player-turn') {
-            pBox.classList.add('active');
-            const wantsHit = shouldPlayerHit(p);
-            statusHint.textContent = wantsHit ? "我想要牌！" : "我停牌。";
-            controls.style.display = wantsHit ? "flex" : "none";
-            if (!wantsHit) {
-                p.status = 'stand';
-                setTimeout(nextTurn, 1000);
-            }
-        } else {
-            statusHint.textContent = p.status === 'stand' ? "已停牌" : (p.status === 'bust' ? "爆牌了！" : "等待中...");
+        pBox.classList.remove('active', 'stand', 'bust', 'result-win', 'result-lose', 'result-draw');
+        if (phase === 'resolved' && p.result) {
+            pBox.classList.add(`result-${p.result}`);
+            const resultLabel = { win: '🏆 獲勝！', lose: '💀 落敗', draw: '🤝 平手' }[p.result];
+            statusHint.textContent = `${resultLabel}（分數：${calculateScore(p.hand)}）`;
             controls.style.display = "none";
+        } else {
+            if (p.status === 'bust') pBox.classList.add('bust');
+            if (p.status === 'stand') pBox.classList.add('stand');
+
+            if (currentPlayerTurn === p.id && phase === 'player-turn') {
+                pBox.classList.add('active');
+                const wantsHit = shouldPlayerHit(p);
+                statusHint.textContent = wantsHit ? "我想要牌！" : "我停牌。";
+                controls.style.display = wantsHit ? "flex" : "none";
+                if (!wantsHit) {
+                    p.status = 'stand';
+                    setTimeout(nextTurn, 1000);
+                }
+            } else {
+                statusHint.textContent = p.status === 'stand' ? "已停牌" : (p.status === 'bust' ? "爆牌了！" : "等待中...");
+                controls.style.display = "none";
+            }
         }
     });
 
@@ -167,6 +174,7 @@ async function startRound() {
     players.forEach(p => {
         p.hand = [];
         p.status = 'playing';
+        p.result = null;
         // Base bet
         const baseBet = 1 + Math.floor(Math.random() * 2);
         p.bet = Math.min(p.chips, isLured ? 5 : baseBet);
@@ -272,13 +280,17 @@ function resolveRound() {
     players.forEach(p => {
         const pScore = calculateScore(p.hand);
         if (p.status === 'bust') {
+            p.result = 'lose';
             msg += ` ${p.name} 爆牌；`;
         } else if (dealerScore > 21 || pScore > dealerScore) {
+            p.result = 'win';
             p.chips += p.bet * 2;
             msg += ` ${p.name} 獲勝；`;
         } else if (pScore < dealerScore) {
+            p.result = 'lose';
             msg += ` ${p.name} 輸了；`;
         } else {
+            p.result = 'draw';
             p.chips += p.bet;
             msg += ` ${p.name} 平手；`;
         }
