@@ -37,10 +37,11 @@
     </script>
 </head>
 <body>
+    <div id="game-status" class="fixed-top">點擊「開始新回合」展開魔法...</div>
+
     <div class="game-container">
         <header>
             <h1>Vantage 21</h1>
-            <div id="game-status">點擊「開始新回合」展開魔法...</div>
         </header>
 
         <div class="main-area">
@@ -52,7 +53,7 @@
                 <div class="dealer-stash">
                     <h3>📦 扣下的牌 (Stash)</h3>
                     <div id="stash-cards" class="cards-row"></div>
-                    <div id="stash-info" style="font-size: 0.8rem; color: #ffd700;">點擊一張扣下的牌，再點擊發牌給閒家或莊家</div>
+                    <div id="stash-info" style="font-size: 0.8rem; color: #ffd700;">點擊選中扣下的牌</div>
                 </div>
             </div>
 
@@ -60,11 +61,6 @@
                 <h3>你的手牌 (莊家)</h3>
                 <div id="dealer-cards" class="cards-row"></div>
                 <div id="dealer-score">分數: 0</div>
-                <div class="controls">
-                    <button id="dealer-hit-btn" class="btn-action" disabled>莊家要牌</button>
-                    <button id="dealer-stand-btn" class="btn-action" disabled>莊家停牌</button>
-                    <button id="next-round-btn">開始新回合</button>
-                </div>
             </div>
 
             <div class="players-grid">
@@ -75,10 +71,6 @@
                     <div class="bet">注好: 0</div>
                     <div class="cards cards-row"></div>
                     <div id="player-0-status" class="player-action-hint">等待中...</div>
-                    <div class="controls player-controls" style="display: none;">
-                        <button class="btn-action give-btn">發牌給他</button>
-                        <button class="btn-magician stash-btn">扣下此牌</button>
-                    </div>
                 </div>
                 <!-- Player B -->
                 <div class="player-box" id="player-1">
@@ -87,10 +79,6 @@
                     <div class="bet">注好: 0</div>
                     <div class="cards cards-row"></div>
                     <div id="player-1-status" class="player-action-hint">等待中...</div>
-                    <div class="controls player-controls" style="display: none;">
-                        <button class="btn-action give-btn">發牌給他</button>
-                        <button class="btn-magician stash-btn">扣下此牌</button>
-                    </div>
                 </div>
                 <!-- Player C -->
                 <div class="player-box" id="player-2">
@@ -99,16 +87,23 @@
                     <div class="bet">注好: 0</div>
                     <div class="cards cards-row"></div>
                     <div id="player-2-status" class="player-action-hint">等待中...</div>
-                    <div class="controls player-controls" style="display: none;">
-                        <button class="btn-action give-btn">發牌給他</button>
-                        <button class="btn-magician stash-btn">扣下此牌</button>
-                    </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="magician-skills">
-            <button id="lure-btn" class="btn-lure">💡 財迷心竅 (引誘下大注)</button>
+    <div class="fixed-bottom-bar">
+        <div class="action-group" id="player-actions" style="display: none;">
+            <button id="global-give-btn" class="btn-action">發牌給他</button>
+            <button id="global-stash-btn" class="btn-magician">扣下此牌</button>
+        </div>
+        <div class="action-group" id="dealer-actions">
+            <button id="dealer-hit-btn" class="btn-action" disabled>莊家要牌</button>
+            <button id="dealer-stand-btn" class="btn-action" disabled>莊家停牌</button>
+        </div>
+        <div class="action-group">
+            <button id="lure-btn" class="btn-lure">💡 財迷心竅</button>
+            <button id="next-round-btn">開始新回合</button>
         </div>
     </div>
     <script src="script.js"></script>

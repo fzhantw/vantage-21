@@ -79,56 +79,60 @@ function shouldPlayerHit(player) {
 function updateUI() {
     // Deck Preview
     const futureDiv = document.getElementById('future-cards');
-    futureDiv.innerHTML = '';
-    deck.slice(0, 3).forEach(card => futureDiv.appendChild(createCardElement(card)));
+    if (futureDiv) {
+        futureDiv.innerHTML = '';
+        deck.slice(0, 3).forEach(card => futureDiv.appendChild(createCardElement(card)));
+    }
 
     // Stash
     const stashDiv = document.getElementById('stash-cards');
-    stashDiv.innerHTML = '';
-    dealerStash.forEach((card, idx) => {
-        const el = createCardElement(card);
-        el.style.cursor = 'pointer';
-        if (idx === selectedStashIndex) {
-            el.style.border = '3px solid #ffd700';
-            el.style.transform = 'scale(1.1)';
-        }
-        el.onclick = () => selectStashCard(idx);
-        stashDiv.appendChild(el);
-    });
+    if (stashDiv) {
+        stashDiv.innerHTML = '';
+        dealerStash.forEach((card, idx) => {
+            const el = createCardElement(card);
+            el.style.cursor = 'pointer';
+            if (idx === selectedStashIndex) {
+                el.style.border = '3px solid #ffd700';
+                el.style.transform = 'scale(1.1)';
+            }
+            el.onclick = () => selectStashCard(idx);
+            stashDiv.appendChild(el);
+        });
+    }
 
     // Dealer
     const dealerDiv = document.getElementById('dealer-cards');
-    dealerDiv.innerHTML = '';
-    dealerHand.forEach(card => dealerDiv.appendChild(createCardElement(card)));
-    document.getElementById('dealer-score').textContent = `分數: ${calculateScore(dealerHand)}`;
+    if (dealerDiv) {
+        dealerDiv.innerHTML = '';
+        dealerHand.forEach(card => dealerDiv.appendChild(createCardElement(card)));
+        document.getElementById('dealer-score').textContent = `分數: ${calculateScore(dealerHand)}`;
+    }
 
     // Players
     players.forEach(p => {
         const pBox = document.getElementById(`player-${p.id}`);
+        if (!pBox) return;
+
         pBox.querySelector('.chips').textContent = `籌碼: ${p.chips}`;
         pBox.querySelector('.bet').textContent = `注好: ${p.bet}`;
         
         const pCards = pBox.querySelector('.cards');
         pCards.innerHTML = '';
         p.hand.forEach((card, idx) => {
-            // First card is hidden for players (Hole Card)
             const isHidden = (idx === 0 && phase !== 'resolved');
             pCards.appendChild(createCardElement(card, isHidden));
         });
 
         const statusHint = document.getElementById(`player-${p.id}-status`);
-        const controls = pBox.querySelector('.player-controls');
         
         pBox.classList.remove('active', 'stand', 'bust', 'out', 'result-win', 'result-lose', 'result-draw');
         if (p.status === 'out') {
             pBox.classList.add('out');
-            statusHint.textContent = '籌碼用盡';
-            controls.style.display = "none";
+            if (statusHint) statusHint.textContent = '籌碼用盡';
         } else if (phase === 'resolved' && p.result) {
             pBox.classList.add(`result-${p.result}`);
             const resultLabel = { win: '🏆 獲勝！', lose: '💀 落敗', draw: '🤝 平手' }[p.result];
-            statusHint.textContent = `${resultLabel}（分數：${calculateScore(p.hand)}）`;
-            controls.style.display = "none";
+            if (statusHint) statusHint.textContent = `${resultLabel}（分數：${calculateScore(p.hand)}）`;
         } else {
             if (p.status === 'bust') pBox.classList.add('bust');
             if (p.status === 'stand') pBox.classList.add('stand');
@@ -136,26 +140,48 @@ function updateUI() {
             if (currentPlayerTurn === p.id && phase === 'player-turn') {
                 pBox.classList.add('active');
                 const wantsHit = shouldPlayerHit(p);
-                statusHint.textContent = wantsHit ? "我想要牌！" : "我停牌。";
-                controls.style.display = wantsHit ? "flex" : "none";
+                if (statusHint) statusHint.textContent = wantsHit ? "我想要牌！" : "我停牌。";
                 if (!wantsHit) {
                     p.status = 'stand';
                     setTimeout(nextTurn, 1000);
                 }
             } else {
-                statusHint.textContent = p.status === 'stand' ? "已停牌" : (p.status === 'bust' ? "爆牌了！" : "等待中...");
-                controls.style.display = "none";
+                if (statusHint) statusHint.textContent = p.status === 'stand' ? "已停牌" : (p.status === 'bust' ? "爆牌了！" : "等待中...");
             }
         }
     });
 
-    document.getElementById('dealer-hit-btn').disabled = (phase !== 'dealer-turn');
-    document.getElementById('dealer-stand-btn').disabled = (phase !== 'dealer-turn');
-    document.getElementById('next-round-btn').disabled = (phase !== 'idle' && phase !== 'resolved');
+    // Toggle global player actions based on turn
+    const pActions = document.getElementById('player-actions');
+    const dActions = document.getElementById('dealer-actions');
     
-    // Lure button logic: can use before round OR during player turn if not already lured
+    if (pActions && dActions) {
+        if (phase === 'player-turn' && currentPlayerTurn !== -1) {
+            const activePlayer = players[currentPlayerTurn];
+            if (shouldPlayerHit(activePlayer)) {
+                pActions.style.display = 'flex';
+            } else {
+                pActions.style.display = 'none';
+            }
+            dActions.style.display = 'none';
+        } else if (phase === 'dealer-turn') {
+            pActions.style.display = 'none';
+            dActions.style.display = 'flex';
+        } else {
+            pActions.style.display = 'none';
+            dActions.style.display = 'none';
+        }
+    }
+
+    const dHitBtn = document.getElementById('dealer-hit-btn');
+    const dStandBtn = document.getElementById('dealer-stand-btn');
+    const nextBtn = document.getElementById('next-round-btn');
     const lureBtn = document.getElementById('lure-btn');
-    lureBtn.disabled = (phase === 'initial-deal' || phase === 'dealer-turn' || phase === 'resolved' || isLured);
+
+    if (dHitBtn) dHitBtn.disabled = (phase !== 'dealer-turn');
+    if (dStandBtn) dStandBtn.disabled = (phase !== 'dealer-turn');
+    if (nextBtn) nextBtn.disabled = (phase !== 'idle' && phase !== 'resolved');
+    if (lureBtn) lureBtn.disabled = (phase === 'initial-deal' || phase === 'dealer-turn' || phase === 'resolved' || isLured);
 }
 
 function createCardElement(card, isHidden = false) {
@@ -188,9 +214,9 @@ async function startRound() {
             p.chips -= p.bet;
         }
     });
-    // isLured is NOT reset here anymore, but at the start of resolution
     
-    document.getElementById('game-status').textContent = "正在發送起始牌...";
+    const statusMsg = document.getElementById('game-status');
+    if (statusMsg) statusMsg.textContent = "正在發送起始牌...";
     updateUI();
 
     // Initial Deal (2 cards each, skip 'out' players)
@@ -208,21 +234,20 @@ async function startRound() {
 
     phase = 'player-turn';
     currentPlayerTurn = -1;
-    document.getElementById('game-status').textContent = "現在是閒家回合，你可以決定是否發牌或扣牌。";
+    if (statusMsg) statusMsg.textContent = "現在是閒家回合，你可以決定是否發牌或扣牌。";
     nextTurn();
 }
 
 function giveCardToPlayer() {
     const p = players[currentPlayerTurn];
+    if (!p) return;
     let card;
     
     if (selectedStashIndex !== -1) {
-        // Use stashed card
         card = dealerStash.splice(selectedStashIndex, 1)[0];
         selectedStashIndex = -1;
         document.getElementById('game-status').textContent = `你將扣下的牌發給了 ${p.name}！`;
     } else {
-        // Use deck
         card = deck.shift();
     }
     
@@ -244,7 +269,7 @@ function selectStashCard(index) {
     if (phase !== 'dealer-turn' && phase !== 'player-turn') return;
     
     if (selectedStashIndex === index) {
-        selectedStashIndex = -1; // Deselect
+        selectedStashIndex = -1;
     } else {
         selectedStashIndex = index;
     }
@@ -309,7 +334,7 @@ function resolveRound() {
         }
     });
 
-    isLured = false; // Reset lure for next round
+    isLured = false;
     document.getElementById('game-status').textContent = msg;
     updateUI();
     checkGameOver();
@@ -336,7 +361,6 @@ document.getElementById('lure-btn').onclick = () => {
     
     isLured = true;
     if (phase === 'player-turn') {
-        // Immediate effect: increase current bets
         players.forEach(p => {
             const currentBet = p.bet;
             const targetBet = 5;
@@ -353,10 +377,7 @@ document.getElementById('lure-btn').onclick = () => {
     updateUI();
 };
 
-// Bind Player Controls (Dynamic delegation or direct bind)
-document.querySelectorAll('.player-box').forEach(box => {
-    box.querySelector('.give-btn').onclick = giveCardToPlayer;
-    box.querySelector('.stash-btn').onclick = stashCard;
-});
+document.getElementById('global-give-btn').onclick = giveCardToPlayer;
+document.getElementById('global-stash-btn').onclick = stashCard;
 
 updateUI();
