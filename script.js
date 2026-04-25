@@ -1,6 +1,7 @@
 let deck = [];
 let dealerHand = [];
 let dealerStash = [];
+let selectedStashIndex = -1;
 let players = [
     { id: 0, name: '閒家 A', chips: 10, hand: [], bet: 0, status: 'waiting' },
     { id: 1, name: '閒家 B', chips: 10, hand: [], bet: 0, status: 'waiting' },
@@ -87,8 +88,11 @@ function updateUI() {
     dealerStash.forEach((card, idx) => {
         const el = createCardElement(card);
         el.style.cursor = 'pointer';
-        el.title = '點擊使用此牌';
-        el.onclick = () => useStashedCard(idx);
+        if (idx === selectedStashIndex) {
+            el.style.border = '3px solid #ffd700';
+            el.style.transform = 'scale(1.1)';
+        }
+        el.onclick = () => selectStashCard(idx);
         stashDiv.appendChild(el);
     });
 
@@ -188,7 +192,19 @@ async function startRound() {
 
 function giveCardToPlayer() {
     const p = players[currentPlayerTurn];
-    p.hand.push(deck.shift());
+    let card;
+    
+    if (selectedStashIndex !== -1) {
+        // Use stashed card
+        card = dealerStash.splice(selectedStashIndex, 1)[0];
+        selectedStashIndex = -1;
+        document.getElementById('game-status').textContent = `你將扣下的牌發給了 ${p.name}！`;
+    } else {
+        // Use deck
+        card = deck.shift();
+    }
+    
+    p.hand.push(card);
     if (calculateScore(p.hand) > 21) {
         p.status = 'bust';
         nextTurn();
@@ -198,16 +214,18 @@ function giveCardToPlayer() {
 
 function stashCard() {
     dealerStash.push(deck.shift());
-    // After stashing, the player still evaluates if they want another card (the new next one)
     document.getElementById('game-status').textContent = "你扣下了一張牌！這張牌現在在你的倉庫中。";
     updateUI();
 }
 
-function useStashedCard(index) {
+function selectStashCard(index) {
     if (phase !== 'dealer-turn' && phase !== 'player-turn') return;
     
-    const card = dealerStash.splice(index, 1)[0];
-    dealerHand.push(card);
+    if (selectedStashIndex === index) {
+        selectedStashIndex = -1; // Deselect
+    } else {
+        selectedStashIndex = index;
+    }
     updateUI();
 }
 
@@ -221,7 +239,16 @@ function nextTurn() {
 }
 
 function dealerHit() {
-    dealerHand.push(deck.shift());
+    let card;
+    if (selectedStashIndex !== -1) {
+        card = dealerStash.splice(selectedStashIndex, 1)[0];
+        selectedStashIndex = -1;
+        document.getElementById('game-status').textContent = "你使用了扣下的牌！";
+    } else {
+        card = deck.shift();
+    }
+    
+    dealerHand.push(card);
     if (calculateScore(dealerHand) > 21) {
         dealerStand();
     }
