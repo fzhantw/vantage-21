@@ -106,6 +106,77 @@ body {
     border: 2px solid #e94560;
 }
 
+.dealer-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 18px;
+    margin: 10px 0;
+}
+
+.dealer-row #dealer-cards {
+    flex: 1;
+    margin: 0;
+}
+
+.deck-pile {
+    position: relative;
+    width: 65px;
+    height: 95px;
+    flex-shrink: 0;
+    margin: 8px 8px 22px 8px;
+    will-change: transform;
+}
+
+.deck-card {
+    position: absolute;
+    width: 65px;
+    height: 95px;
+    border-radius: 8px;
+    background: linear-gradient(45deg, #1a1a2e 25%, #16213e 25%, #16213e 50%, #1a1a2e 50%, #1a1a2e 75%, #16213e 75%, #16213e 100%);
+    background-size: 10px 10px;
+    border: 2px solid #6a0dad;
+    box-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+}
+
+.deck-card:nth-child(1) { top: 0; left: 0; }
+.deck-card:nth-child(2) { top: -3px; left: -3px; }
+.deck-card:nth-child(3) { top: -6px; left: -6px; }
+
+.deck-count {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.8rem;
+    color: #ffd700;
+    font-weight: bold;
+    white-space: nowrap;
+    letter-spacing: 0.05em;
+}
+
+.deck-pile.dealing {
+    animation: deckPulse 0.32s ease-out;
+}
+
+@keyframes deckPulse {
+    0%, 100% { transform: translate(0, 0) rotate(0deg); }
+    45% { transform: translate(-4px, -3px) rotate(-3deg); }
+}
+
+.deck-pile.empty .deck-card {
+    background: transparent;
+    border-style: dashed;
+    box-shadow: none;
+}
+
+.deck-pile.empty .deck-count {
+    color: #888;
+}
+
+.card.flying {
+    will-change: transform, opacity;
+}
+
 .players-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -277,6 +348,27 @@ button:disabled {
         width: 45px; /* Slightly smaller main cards */
         height: 65px;
         font-size: 0.8rem;
+    }
+
+    .deck-pile, .deck-card {
+        width: 45px;
+        height: 65px;
+    }
+
+    .deck-pile {
+        margin: 6px 6px 18px 6px;
+    }
+
+    .deck-card:nth-child(2) { top: -2px; left: -2px; }
+    .deck-card:nth-child(3) { top: -4px; left: -4px; }
+
+    .deck-count {
+        font-size: 0.7rem;
+        bottom: -16px;
+    }
+
+    .dealer-row {
+        gap: 10px;
     }
 
     .cards-row {

@@ -77,6 +77,12 @@ function shouldPlayerHit(player) {
 // --- UI Updates ---
 
 function updateUI() {
+    // Deck pile count + empty state
+    const deckCountEl = document.querySelector('.deck-count');
+    if (deckCountEl) deckCountEl.textContent = deck.length;
+    const deckPileEl = document.getElementById('deck-pile');
+    if (deckPileEl) deckPileEl.classList.toggle('empty', deck.length === 0);
+
     // Deck Preview
     const futureDiv = document.getElementById('future-cards');
     if (futureDiv) {
@@ -190,6 +196,50 @@ function updateUI() {
     if (lureBtn) lureBtn.disabled = (phase === 'initial-deal' || phase === 'dealer-turn' || phase === 'resolved' || isLured);
 }
 
+function animateCardFlight(targetCardEl, fromEl) {
+    if (!targetCardEl || !fromEl) return;
+    const fromRect = fromEl.getBoundingClientRect();
+    const toRect = targetCardEl.getBoundingClientRect();
+    if (toRect.width === 0 || fromRect.width === 0) return;
+    const dx = (fromRect.left + fromRect.width / 2) - (toRect.left + toRect.width / 2);
+    const dy = (fromRect.top + fromRect.height / 2) - (toRect.top + toRect.height / 2);
+
+    targetCardEl.style.transition = 'none';
+    targetCardEl.style.transform = `translate(${dx}px, ${dy}px) rotate(-180deg) scale(0.85)`;
+    targetCardEl.style.opacity = '0.4';
+    targetCardEl.classList.add('flying');
+    void targetCardEl.offsetHeight;
+
+    requestAnimationFrame(() => {
+        targetCardEl.style.transition = 'transform 0.45s cubic-bezier(0.2, 0.7, 0.3, 1), opacity 0.3s ease-out';
+        targetCardEl.style.transform = '';
+        targetCardEl.style.opacity = '';
+    });
+
+    setTimeout(() => {
+        targetCardEl.classList.remove('flying');
+        targetCardEl.style.transition = '';
+        targetCardEl.style.transform = '';
+        targetCardEl.style.opacity = '';
+    }, 500);
+
+    if (fromEl.classList.contains('deck-pile')) {
+        fromEl.classList.remove('dealing');
+        void fromEl.offsetHeight;
+        fromEl.classList.add('dealing');
+        setTimeout(() => fromEl.classList.remove('dealing'), 340);
+    }
+}
+
+function animateLastCardFrom(containerSelector, fromSelector = '#deck-pile') {
+    const container = document.querySelector(containerSelector);
+    const fromEl = document.querySelector(fromSelector);
+    if (!container || !fromEl) return;
+    const cards = container.querySelectorAll('.card');
+    if (cards.length === 0) return;
+    animateCardFlight(cards[cards.length - 1], fromEl);
+}
+
 function createCardElement(card, isHidden = false) {
     const el = document.createElement('div');
     if (isHidden) {
@@ -231,10 +281,12 @@ async function startRound() {
             if (p.status === 'out') continue;
             p.hand.push(deck.shift());
             updateUI();
+            animateLastCardFrom(`#player-${p.id} .cards`);
             await new Promise(r => setTimeout(r, 300));
         }
         dealerHand.push(deck.shift());
         updateUI();
+        animateLastCardFrom('#dealer-cards');
         await new Promise(r => setTimeout(r, 300));
     }
 
@@ -248,27 +300,31 @@ function giveCardToPlayer() {
     const p = players[currentPlayerTurn];
     if (!p) return;
     let card;
-    
+    let fromStash = false;
+
     if (selectedStashIndex !== -1) {
         card = dealerStash.splice(selectedStashIndex, 1)[0];
         selectedStashIndex = -1;
+        fromStash = true;
         document.getElementById('game-status').textContent = `你將扣下的牌發給了 ${p.name}！`;
     } else {
         card = deck.shift();
     }
-    
+
     p.hand.push(card);
     if (calculateScore(p.hand) > 21) {
         p.status = 'bust';
         nextTurn();
     }
     updateUI();
+    animateLastCardFrom(`#player-${p.id} .cards`, fromStash ? '#stash-cards' : '#deck-pile');
 }
 
 function stashCard() {
     dealerStash.push(deck.shift());
     document.getElementById('game-status').textContent = "你扣下了一張牌！這張牌現在在你的倉庫中。";
     updateUI();
+    animateLastCardFrom('#stash-cards');
 }
 
 function selectStashCard(index) {
@@ -296,19 +352,22 @@ function nextTurn() {
 
 function dealerHit() {
     let card;
+    let fromStash = false;
     if (selectedStashIndex !== -1) {
         card = dealerStash.splice(selectedStashIndex, 1)[0];
         selectedStashIndex = -1;
+        fromStash = true;
         document.getElementById('game-status').textContent = "你使用了扣下的牌！";
     } else {
         card = deck.shift();
     }
-    
+
     dealerHand.push(card);
     if (calculateScore(dealerHand) > 21) {
         dealerStand();
     }
     updateUI();
+    animateLastCardFrom('#dealer-cards', fromStash ? '#stash-cards' : '#deck-pile');
 }
 
 function dealerStand() {
